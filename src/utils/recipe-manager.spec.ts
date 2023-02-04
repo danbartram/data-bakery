@@ -6,7 +6,7 @@ describe('prepareRecipes', () => {
     const productId1 = new AutoIncId() // 1
     const productId2 = new AutoIncId() // 2
 
-    const recipeBlock = {
+    const recipeBundle = {
       user: [
         { id: userId, email: 'hi@there.com', firstName: 'Eric' },
       ],
@@ -20,7 +20,7 @@ describe('prepareRecipes', () => {
       ],
     }
 
-    const desiredResult = {
+    const expectedResult = {
       user: [
         { id: 1, email: 'hi@there.com', firstName: 'Eric' },
       ],
@@ -35,15 +35,16 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const generatorThing = manager.prepareRecipes([recipeBlock])
-    expect(generatorThing.next().value).toEqual(desiredResult)
+    const recipeGenerator = manager.prepareRecipes([recipeBundle])
+    expect(recipeGenerator.next().value).toEqual(expectedResult)
+    expect(recipeGenerator.next().done).toEqual(true)
   })
 
   it('generates named IDs correctly', () => {
     const specialUserId = new NamedId('specialUser')
     const anotherSpecialUserId = new NamedId('someOtherName')
 
-    const recipeBlock = {
+    const recipeBundle = {
       user: [
         { id: new AutoIncId(), email: 'hi@there.com', firstName: 'Eric' },
         { id: specialUserId, email: 'alice@test.com', firstName: 'Alice' },
@@ -56,7 +57,7 @@ describe('prepareRecipes', () => {
       ],
     }
 
-    const desiredResult = {
+    const expectedResult = {
       user: [
         { id: 1, email: 'hi@there.com', firstName: 'Eric' },
         { id: 100000, email: 'alice@test.com', firstName: 'Alice' },
@@ -72,14 +73,15 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const generatorThing = manager.prepareRecipes([recipeBlock])
-    expect(generatorThing.next().value).toEqual(desiredResult)
+    const recipeGenerator = manager.prepareRecipes([recipeBundle])
+    expect(recipeGenerator.next().value).toEqual(expectedResult)
+    expect(recipeGenerator.next().done).toEqual(true)
   })
 
   it('generates the same named ID value for duplicate NamedId instances', () => {
     const specialUserId = new NamedId('specialUser')
 
-    const recipeBlock = {
+    const recipeBundle = {
       user: [
         { id: new AutoIncId(), email: 'hi@there.com', firstName: 'Eric' },
         { id: specialUserId, email: 'alice@test.com', firstName: 'Alice' },
@@ -91,7 +93,7 @@ describe('prepareRecipes', () => {
       ],
     }
 
-    const desiredResult = {
+    const expectedResult = {
       user: [
         { id: 1, email: 'hi@there.com', firstName: 'Eric' },
         { id: 100000, email: 'alice@test.com', firstName: 'Alice' },
@@ -104,12 +106,13 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const generatorThing = manager.prepareRecipes([recipeBlock])
-    expect(generatorThing.next().value).toEqual(desiredResult)
+    const recipeGenerator = manager.prepareRecipes([recipeBundle])
+    expect(recipeGenerator.next().value).toEqual(expectedResult)
+    expect(recipeGenerator.next().done).toEqual(true)
   })
 
   it('exports generated named IDs correctly', () => {
-    const recipeBlock = {
+    const recipeBundle = {
       user: [
         { id: new AutoIncId(), email: 'hi@there.com', firstName: 'Eric' },
         { id: new NamedId('someUser'), email: 'alice@test.com', firstName: 'Alice' },
@@ -133,9 +136,9 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const generatorThing = manager.prepareRecipes([recipeBlock])
+    const recipeGenerator = manager.prepareRecipes([recipeBundle])
     // We're not checking the prepared result here, just that the IDs are handled correctly
-    generatorThing.next()
+    recipeGenerator.next()
 
     expect(manager.getGeneratedNamedIds()).toEqual(expectedIdMap)
   })

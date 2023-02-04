@@ -86,43 +86,7 @@ export class RecipeManager {
         const tableRows = recipeBundle[tableName]
 
         for (const tableRow of tableRows) {
-          const columnNames = Object.keys(tableRow)
-
-          for (const columnName of columnNames) {
-            if (tableRow[columnName] instanceof AutoIncId) {
-              const autoThing: AutoIncId = tableRow[columnName]
-              // As they're objects, we can set all uses of this AutoInc instance to have the
-              // same generated value
-              if (autoThing.value === undefined) {
-                autoThing.value = this.#generateAutoIncForTable(tableName)
-              }
-
-              // Swap out the AutoInc placeholder with its generated value
-              tableRow[columnName] = autoThing.value
-            }
-
-            if (tableRow[columnName] instanceof NamedIdForTable) {
-              const namedIdForTable: NamedIdForTable = tableRow[columnName]
-              // As they're objects, we can set all uses of this AutoInc instance to have the
-              // same generated value
-              if (namedIdForTable.value === undefined) {
-                namedIdForTable.value = this.#generateNamedIdForTable(namedIdForTable.tableName, namedIdForTable.name)
-              }
-
-              // Swap out the NamedId placeholder with its generated value
-              recipeBundle[namedIdForTable.tableName][columnName] = namedIdForTable.value
-            } else if (tableRow[columnName] instanceof NamedId) {
-              const namedId: NamedId = tableRow[columnName]
-              // As they're objects, we can set all uses of this AutoInc instance to have the
-              // same generated value
-              if (namedId.value === undefined) {
-                namedId.value = this.#generateNamedIdForTable(tableName, namedId.name)
-              }
-
-              // Swap out the NamedId placeholder with its generated value
-              tableRow[columnName] = namedId.value
-            }
-          }
+          this.#processTableRow(tableName, tableRow)
         }
       }
 
@@ -130,5 +94,43 @@ export class RecipeManager {
     }
 
     return Object.keys(this.#tableAutoIncIds)
+  }
+
+  /**
+   * Process an indiviual table row so that all auto and named IDs are generated.
+   *
+   * @param tableName
+   * @param tableRow
+   */
+  #processTableRow (tableName: TableName, tableRow: Record<string, any>): void {
+    const columnNames = Object.keys(tableRow)
+
+    for (const columnName of columnNames) {
+      if (tableRow[columnName] instanceof AutoIncId) {
+        const autoIncId: AutoIncId = tableRow[columnName]
+
+        if (autoIncId.value === undefined) {
+          autoIncId.value = this.#generateAutoIncForTable(tableName)
+        }
+
+        tableRow[columnName] = autoIncId.value
+      } else if (tableRow[columnName] instanceof NamedIdForTable) {
+        const namedIdForTable: NamedIdForTable = tableRow[columnName]
+
+        if (namedIdForTable.value === undefined) {
+          namedIdForTable.value = this.#generateNamedIdForTable(namedIdForTable.tableName, namedIdForTable.name)
+        }
+
+        tableRow[columnName] = namedIdForTable.value
+      } else if (tableRow[columnName] instanceof NamedId) {
+        const namedId: NamedId = tableRow[columnName]
+
+        if (namedId.value === undefined) {
+          namedId.value = this.#generateNamedIdForTable(tableName, namedId.name)
+        }
+
+        tableRow[columnName] = namedId.value
+      }
+    }
   }
 }

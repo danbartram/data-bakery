@@ -1,6 +1,51 @@
-import { AutoIncId, RecipeManager, NamedId, NamedIdForTable } from './recipe-manager'
+import { AutoIncId, RecipeManager, NamedId, NamedIdForTable, type RecipeBundle } from './recipe-manager'
 
 describe('prepareRecipes', () => {
+  it('handles multiple recipe bundles', () => {
+    const recipeBundles: RecipeBundle[] = [
+      {
+        user: [
+          { id: 1, email: 'hi@there.com', firstName: 'Eric' },
+        ],
+        orders: [
+          { id: 100, userId: 1, amount: 5000 },
+          { id: 101, userId: 1, amount: 15000 },
+        ],
+      },
+      {
+        user: [
+          { id: 2, email: 'bob@example.com', firstName: 'Bob' },
+        ],
+      },
+    ]
+
+    const firstResult = {
+      user: [
+        { id: 1, email: 'hi@there.com', firstName: 'Eric' },
+      ],
+      orders: [
+        { id: 100, userId: 1, amount: 5000 },
+        { id: 101, userId: 1, amount: 15000 },
+      ],
+    }
+
+    const secondResult = {
+      user: [
+        { id: 2, email: 'bob@example.com', firstName: 'Bob' },
+      ],
+    }
+
+    const manager = new RecipeManager()
+    const recipeGenerator = manager.prepareRecipes(recipeBundles)
+
+    const outputOne = recipeGenerator.next().value
+    expect(outputOne).toEqual(firstResult)
+
+    const outputTwo = recipeGenerator.next().value
+    expect(outputTwo).toEqual(secondResult)
+    expect(recipeGenerator.next().done).toEqual(true)
+  })
+
   it('generates AutoInc values correctly', () => {
     const userId = new AutoIncId() // 1
     const productId1 = new AutoIncId() // 1

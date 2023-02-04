@@ -150,8 +150,6 @@ export class RecipeManager {
 
       yield recipeBundle
     }
-
-    return Object.keys(this.#tableAutoIncIds)
   }
 
   /**

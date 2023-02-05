@@ -62,7 +62,7 @@ import * as testIds from './test-data/ids.json'
 test('Check customer with no orders returns empty array', () => {
     const customerId = testIds.customer.customerWithNoOrders.id
 
-    // Fetch the customer's users
+    // Try and fetch the customer's orders
 })
 ```
 

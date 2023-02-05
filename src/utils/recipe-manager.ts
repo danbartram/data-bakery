@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash'
+
 export type TableName = string
 export type ColumnName = string
 export type NamedIdName = string
@@ -25,6 +27,14 @@ export type NamedIdExport = {
 
 /** The map that's generated to export all named IDs across all tables */
 export type NamedIdExportMap = Record<TableName, Record<NamedIdName, NamedIdExport>>
+
+/** An object containing table names as keys, with default column values in a nested object */
+export type TableDefaults = Record<TableName, Record<ColumnName, any>>
+
+/** The config options available for the RecipeManager */
+export type RecipeManagerConfig = {
+  tableDefaults?: TableDefaults
+}
 
 /**
  * A convenience class to use for AUTO INCREMENT IDs.
@@ -77,9 +87,17 @@ export class RecipeManager {
   #tableAutoIncIds: Record<TableName, number> = {}
   /** A map containing all of the unique named IDs in each table, keyed by table name */
   #tableNamedIds: Record<TableName, Set<NamedIdName>> = {}
+  /** A map containing any default row values, keyed by table name */
+  #tableDefaults: TableDefaults = {}
 
   /** The first ID value to use with named IDs */
   #namedIdRangeStart = 100000
+
+  constructor (config: RecipeManagerConfig = {}) {
+    if (config.tableDefaults !== undefined) {
+      this.#tableDefaults = config.tableDefaults
+    }
+  }
 
   /**
    * Generate and retrieve the next AUTO INCREMENT ID value to use for a table.
@@ -138,52 +156,67 @@ export class RecipeManager {
    */
   * prepareRecipes (recipeBundles: RecipeBundle[]): Generator<RecipeBundle> {
     for (const recipeBundle of recipeBundles) {
-      const tableNames = Object.keys(recipeBundle)
+      const tableNames: TableName[] = Object.keys(recipeBundle)
+      const preparedBundle: RecipeBundle = {}
 
-      for (const tableName of tableNames) {
-        const tableRows = recipeBundle[tableName]
+      tableNames.forEach(tableName => {
+        const tableRows: Record<ColumnName, any> = recipeBundle[tableName]
 
-        for (const tableRow of tableRows) {
-          this.#processTableRow(tableName, tableRow)
-        }
-      }
+        const preparedRows = tableRows.map(tableRow => {
+          return this.#processTableRow(tableName, tableRow)
+        })
 
-      yield recipeBundle
+        preparedBundle[tableName] = preparedRows
+      })
+
+      yield preparedBundle
     }
+  }
+
+  /**
+   * Include any default table fields (optional) to the row
+   */
+  addDefaultFieldsToRow (tableName: TableName, row): object {
+    // cloneDeep ensures each `AutoIncId()` is its own instance
+    const defaultRowData = cloneDeep(this.#tableDefaults[tableName]) ?? {}
+    return { ...defaultRowData, ...row }
   }
 
   /**
    * Process an indiviual table row so that all auto and named IDs are generated.
    */
-  #processTableRow (tableName: TableName, tableRow: Record<ColumnName, any>): void {
-    const columnNames = Object.keys(tableRow)
+  #processTableRow (tableName: TableName, tableRow: Record<ColumnName, any>): Record<ColumnName, any> {
+    const processedRow = this.addDefaultFieldsToRow(tableName, tableRow)
+    const columnNames = Object.keys(processedRow)
 
     for (const columnName of columnNames) {
-      if (tableRow[columnName] instanceof AutoIncId) {
-        const autoIncId: AutoIncId = tableRow[columnName]
+      if (processedRow[columnName] instanceof AutoIncId) {
+        const autoIncId: AutoIncId = processedRow[columnName]
 
         if (autoIncId.value === undefined) {
           autoIncId.value = this.#generateAutoIncForTable(tableName)
         }
 
-        tableRow[columnName] = autoIncId.value
-      } else if (tableRow[columnName] instanceof NamedIdForTable) {
-        const namedIdForTable: NamedIdForTable = tableRow[columnName]
+        processedRow[columnName] = autoIncId.value
+      } else if (processedRow[columnName] instanceof NamedIdForTable) {
+        const namedIdForTable: NamedIdForTable = processedRow[columnName]
 
         if (namedIdForTable.value === undefined) {
           namedIdForTable.value = this.#generateNamedIdForTable(namedIdForTable.tableName, namedIdForTable.name)
         }
 
-        tableRow[columnName] = namedIdForTable.value
-      } else if (tableRow[columnName] instanceof NamedId) {
-        const namedId: NamedId = tableRow[columnName]
+        processedRow[columnName] = namedIdForTable.value
+      } else if (processedRow[columnName] instanceof NamedId) {
+        const namedId: NamedId = processedRow[columnName]
 
         if (namedId.value === undefined) {
           namedId.value = this.#generateNamedIdForTable(tableName, namedId.name)
         }
 
-        tableRow[columnName] = namedId.value
+        processedRow[columnName] = namedId.value
       }
     }
+
+    return processedRow
   }
 }

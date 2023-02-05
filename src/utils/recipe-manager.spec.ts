@@ -46,6 +46,50 @@ describe('prepareRecipes', () => {
     expect(recipeGenerator.next().done).toEqual(true)
   })
 
+  it('populates default column values', () => {
+    const recipeBundles: RecipeBundle[] = [
+      {
+        user: [
+          { email: 'eric@email.com' },
+        ],
+      },
+      {
+        user: [
+          { email: 'bob@test.com', otherField: 'Hello' },
+        ],
+      },
+    ]
+
+    const firstResult = {
+      user: [
+        { id: 1, email: 'eric@email.com', otherField: 'Ahoy' },
+      ],
+    }
+
+    const secondResult = {
+      user: [
+        { id: 2, email: 'bob@test.com', otherField: 'Hello' },
+      ],
+    }
+
+    const tableDefaults = {
+      user: {
+        id: new AutoIncId(),
+        otherField: 'Ahoy',
+      },
+    }
+
+    const manager = new RecipeManager({ tableDefaults })
+    const recipeGenerator = manager.prepareRecipes(recipeBundles)
+
+    const outputOne = recipeGenerator.next().value
+    expect(outputOne).toEqual(firstResult)
+
+    const outputTwo = recipeGenerator.next().value
+    expect(outputTwo).toEqual(secondResult)
+    expect(recipeGenerator.next().done).toEqual(true)
+  })
+
   it('generates AutoInc values correctly', () => {
     const userId = new AutoIncId() // 1
     const productId1 = new AutoIncId() // 1

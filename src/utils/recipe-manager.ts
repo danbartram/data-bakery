@@ -1,5 +1,3 @@
-import { cloneDeep } from 'lodash'
-
 export type TableName = string
 export type ColumnName = string
 export type NamedIdName = string
@@ -28,8 +26,8 @@ export type NamedIdExport = {
 /** The map that's generated to export all named IDs across all tables */
 export type NamedIdExportMap = Record<TableName, Record<NamedIdName, NamedIdExport>>
 
-/** An object containing table names as keys, with default column values in a nested object */
-export type TableDefaults = Record<TableName, Record<ColumnName, any>>
+/** An object containing table names as keys, with the values as functions which return column values in a nested object */
+export type TableDefaults = Record<TableName, () => Record<ColumnName, any>>
 
 /** The config options available for the RecipeManager */
 export type RecipeManagerConfig = {
@@ -87,7 +85,7 @@ export class RecipeManager {
   #tableAutoIncIds: Record<TableName, number> = {}
   /** A map containing all of the unique named IDs in each table, keyed by table name */
   #tableNamedIds: Record<TableName, Set<NamedIdName>> = {}
-  /** A map containing any default row values, keyed by table name */
+  /** A map containing functions to generate default row values, keyed by table name */
   #tableDefaults: TableDefaults = {}
 
   /** The first ID value to use with named IDs */
@@ -177,9 +175,13 @@ export class RecipeManager {
    * Include any default table fields (optional) to the row
    */
   addDefaultFieldsToRow (tableName: TableName, row): object {
-    // cloneDeep ensures each `AutoIncId()` is its own instance
-    const defaultRowData = cloneDeep(this.#tableDefaults[tableName]) ?? {}
-    return { ...defaultRowData, ...row }
+    const tableHasDefaults = typeof this.#tableDefaults[tableName] === 'function'
+
+    if (!tableHasDefaults) {
+      return row
+    }
+
+    return { ...this.#tableDefaults[tableName](), ...row }
   }
 
   /**

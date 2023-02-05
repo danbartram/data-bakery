@@ -73,10 +73,10 @@ describe('prepareRecipes', () => {
     }
 
     const tableDefaults = {
-      user: {
+      user: () => ({
         id: new AutoIncId(),
         otherField: 'Ahoy',
-      },
+      }),
     }
 
     const manager = new RecipeManager({ tableDefaults })

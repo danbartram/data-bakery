@@ -1,28 +1,39 @@
+import { chunkArray } from './array-util'
 import { type ColumnName, RawSQL, type RecipeBundle } from './recipe-manager'
 
-export type SQLDialect = 'mysql'
+const defaultBatchSize = 100
+
+type SQLGeneratorConfig = {
+  batchSize?: number
+}
 
 /**
  * Generate SQL queries for the provided recipe bundle.
  */
-export function sqlForRecipeBundle (recipeBundle: RecipeBundle, dialect: SQLDialect = 'mysql'): string {
+export function sqlForRecipeBundle (recipeBundle: RecipeBundle, config: SQLGeneratorConfig = {}): string {
   const sqlQueries: string[] = []
+  const batchSize = config.batchSize ?? defaultBatchSize
 
   Object.keys(recipeBundle).forEach(tableName => {
     // Group rows by their used column names, so we can batch insert them efficiently
     const groupedRows = groupRowsByColumns(recipeBundle[tableName])
 
     groupedRows.forEach((rows, columnMapKey) => {
-      // Generate a value list, i.e. a CSV of column values between parentheses, for each row
-      const valueLists: string[] = rows.map(row => {
-        const newValueList: string[] = columnMapKey.split(',').map(columnName => {
-          return escapeValue(row[columnName])
+      // Split the rows into chunks up to batchSize to avoid giant INSERT queries
+      const rowChunks = chunkArray(rows, batchSize)
+
+      rowChunks.forEach(rows => {
+        // Generate a value list, i.e. a CSV of column values between parentheses, for each row
+        const valueLists: string[] = rows.map(row => {
+          const newValueList: string[] = columnMapKey.split(',').map(columnName => {
+            return escapeValue(row[columnName])
+          })
+
+          return `(${newValueList.join(', ')})`
         })
 
-        return `(${newValueList.join(', ')})`
+        sqlQueries.push(`INSERT INTO \`${tableName}\` (${columnMapKey}) VALUES ${valueLists.join(', ')};`)
       })
-
-      sqlQueries.push(`INSERT INTO \`${tableName}\` (${columnMapKey}) VALUES ${valueLists.join(', ')};`)
     })
   })
 
@@ -50,7 +61,7 @@ function escapeValue (value: any): any {
 /**
  * Group rows by their column names to allow for efficient INSERT batching
  */
-export function groupRowsByColumns (rows: Array<Record<string, any>>): Map<string, Record<string, any>> {
+export function groupRowsByColumns (rows: Array<Record<string, any>>): Map<string, Array<Record<string, any>>> {
   const columnMap = new Map<string, Array<Record<string, any>>>()
   const firstRowColumnNames = Object.keys(rows[0])
 

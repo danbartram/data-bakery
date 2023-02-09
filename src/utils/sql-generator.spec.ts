@@ -13,6 +13,17 @@ describe('sql-generator', () => {
 
       expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter'), (2, 'Paul');")
     })
+    it('outputs batched sql up to batchSize', () => {
+      const sql = sqlForRecipeBundle({
+        user: [
+          { id: 1, name: 'Peter' },
+          { id: 2, name: 'Paul' },
+          { id: 3, name: 'Testing' },
+        ],
+      }, { batchSize: 2 })
+
+      expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter'), (2, 'Paul');\nINSERT INTO `user` (id,name) VALUES (3, 'Testing');")
+    })
     it('avoids batching different column groups', () => {
       const sql = sqlForRecipeBundle({
         user: [

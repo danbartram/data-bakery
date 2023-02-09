@@ -62,6 +62,14 @@ export class NamedId {
   }
 }
 
+export class RawSQL {
+  rawValue: string
+
+  constructor (rawValue: string) {
+    this.rawValue = rawValue
+  }
+}
+
 /**
  * A wrapper for `NamedId` to allow accessing the ID from within a different
  * table recipe to where it's defined.

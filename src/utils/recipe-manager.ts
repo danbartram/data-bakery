@@ -158,25 +158,23 @@ export class RecipeManager {
   }
 
   /**
-   * Generator method to prepare an array of recipe bundles into data ready for exporting.
+   * Prepare a recipe bundle into data ready for exporting.
    */
-  * prepareRecipes (recipeBundles: RecipeBundle[]): Generator<RecipeBundle> {
-    for (const recipeBundle of recipeBundles) {
-      const tableNames: TableName[] = Object.keys(recipeBundle)
-      const preparedBundle: RecipeBundle = {}
+  prepareRecipe (recipeBundle: RecipeBundle): RecipeBundle {
+    const tableNames: TableName[] = Object.keys(recipeBundle)
+    const preparedBundle: RecipeBundle = {}
 
-      tableNames.forEach(tableName => {
-        const tableRows: Record<ColumnName, any> = recipeBundle[tableName]
+    tableNames.forEach(tableName => {
+      const tableRows: Record<ColumnName, any> = recipeBundle[tableName]
 
-        const preparedRows = tableRows.map(tableRow => {
-          return this.#processTableRow(tableName, tableRow)
-        })
-
-        preparedBundle[tableName] = preparedRows
+      const preparedRows = tableRows.map(tableRow => {
+        return this.#processTableRow(tableName, tableRow)
       })
 
-      yield preparedBundle
-    }
+      preparedBundle[tableName] = preparedRows
+    })
+
+    return preparedBundle
   }
 
   /**

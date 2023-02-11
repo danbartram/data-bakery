@@ -1,6 +1,6 @@
 import { AutoIncId, RecipeManager, NamedId, NamedIdForTable, type RecipeBundle } from './recipe-manager'
 
-describe('prepareRecipes', () => {
+describe('prepareRecipe', () => {
   it('handles multiple recipe bundles', () => {
     const recipeBundles: RecipeBundle[] = [
       {
@@ -36,14 +36,11 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const recipeGenerator = manager.prepareRecipes(recipeBundles)
+    const preparedRecipes = recipeBundles.map(bundle => manager.prepareRecipe(bundle))
 
-    const outputOne = recipeGenerator.next().value
-    expect(outputOne).toEqual(firstResult)
-
-    const outputTwo = recipeGenerator.next().value
-    expect(outputTwo).toEqual(secondResult)
-    expect(recipeGenerator.next().done).toEqual(true)
+    expect(preparedRecipes[0]).toEqual(firstResult)
+    expect(preparedRecipes[1]).toEqual(secondResult)
+    expect(preparedRecipes.length).toEqual(2)
   })
 
   it('populates default column values', () => {
@@ -80,14 +77,11 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager({ tableDefaults })
-    const recipeGenerator = manager.prepareRecipes(recipeBundles)
+    const preparedRecipes = recipeBundles.map(bundle => manager.prepareRecipe(bundle))
 
-    const outputOne = recipeGenerator.next().value
-    expect(outputOne).toEqual(firstResult)
-
-    const outputTwo = recipeGenerator.next().value
-    expect(outputTwo).toEqual(secondResult)
-    expect(recipeGenerator.next().done).toEqual(true)
+    expect(preparedRecipes[0]).toEqual(firstResult)
+    expect(preparedRecipes[1]).toEqual(secondResult)
+    expect(preparedRecipes.length).toEqual(2)
   })
 
   it('generates AutoInc values correctly', () => {
@@ -124,9 +118,8 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const recipeGenerator = manager.prepareRecipes([recipeBundle])
-    expect(recipeGenerator.next().value).toEqual(expectedResult)
-    expect(recipeGenerator.next().done).toEqual(true)
+    const preparedRecipe = manager.prepareRecipe(recipeBundle)
+    expect(preparedRecipe).toEqual(expectedResult)
   })
 
   it('generates named IDs correctly', () => {
@@ -162,9 +155,8 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const recipeGenerator = manager.prepareRecipes([recipeBundle])
-    expect(recipeGenerator.next().value).toEqual(expectedResult)
-    expect(recipeGenerator.next().done).toEqual(true)
+    const preparedBundle = manager.prepareRecipe(recipeBundle)
+    expect(preparedBundle).toEqual(expectedResult)
   })
 
   it('generates the same named ID value for duplicate NamedId instances', () => {
@@ -195,9 +187,8 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const recipeGenerator = manager.prepareRecipes([recipeBundle])
-    expect(recipeGenerator.next().value).toEqual(expectedResult)
-    expect(recipeGenerator.next().done).toEqual(true)
+    const preparedRecipe = manager.prepareRecipe(recipeBundle)
+    expect(preparedRecipe).toEqual(expectedResult)
   })
 
   it('exports generated named IDs correctly', () => {
@@ -225,9 +216,9 @@ describe('prepareRecipes', () => {
     }
 
     const manager = new RecipeManager()
-    const recipeGenerator = manager.prepareRecipes([recipeBundle])
+
     // We're not checking the prepared result here, just that the IDs are handled correctly
-    recipeGenerator.next()
+    manager.prepareRecipe(recipeBundle)
 
     expect(manager.getGeneratedNamedIds()).toEqual(expectedIdMap)
   })

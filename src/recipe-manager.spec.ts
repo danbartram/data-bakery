@@ -1,4 +1,4 @@
-import { AutoIncId, NamedId, NamedIdForTable } from '../recipe-helper'
+import { AutoIncId, NamedId, NamedIdForTable } from './recipe-helper'
 import { RecipeManager, type RecipeBundle } from './recipe-manager'
 
 describe('prepareRecipe', () => {

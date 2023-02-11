@@ -1,4 +1,4 @@
-import { type TableName } from './utils/recipe-manager'
+import { type TableName } from './recipe-manager'
 
 export type NamedIdName = string
 

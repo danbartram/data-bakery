@@ -1,4 +1,4 @@
-import { AutoIncId, NamedId, NamedIdForTable, type NamedIdName } from '../recipe-helper'
+import { AutoIncId, NamedId, NamedIdForTable, type NamedIdName } from './recipe-helper'
 
 export type TableName = string
 export type ColumnName = string

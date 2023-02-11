@@ -1,6 +1,6 @@
 import { chunkArray } from './array-util'
 import { RawSQL } from '../recipe-helper'
-import { type ColumnName, type RecipeBundle } from './recipe-manager'
+import { type ColumnName, type RecipeBundle } from '../recipe-manager'
 
 const defaultBatchSize = 100
 

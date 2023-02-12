@@ -118,6 +118,10 @@ export class RecipeManager {
     tableNames.forEach(tableName => {
       const tableRows: Record<ColumnName, any> = recipeBundle[tableName]
 
+      if (!Array.isArray(tableRows)) {
+        return
+      }
+
       const preparedRows = tableRows.map(tableRow => {
         return this.#processTableRow(tableName, tableRow)
       })
@@ -142,7 +146,7 @@ export class RecipeManager {
   }
 
   /**
-   * Process an indiviual table row so that all auto and named IDs are generated.
+   * Process an individual table row so that all auto and named IDs are generated.
    */
   #processTableRow (tableName: TableName, tableRow: Record<ColumnName, any>): Record<ColumnName, any> {
     const processedRow = this.addDefaultFieldsToRow(tableName, tableRow)

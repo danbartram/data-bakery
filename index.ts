@@ -96,6 +96,7 @@ program.command('generate')
     })
 
     await exportGenerator.exportAllRecipes()
+    exportGenerator.exportMetadataFile()
 
     logger.info('Done')
   })

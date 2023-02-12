@@ -90,4 +90,13 @@ export class ExportGenerator {
     const nextPrefixNumber = ((this.#startPrefix ?? 0) + this.#exportedFilesCount)
     return `${nextPrefixNumber.toString().padStart(significantFigures, '0')}-`
   }
+
+  exportMetadataFile (): void {
+    const outputFilePath = `${this.#outputDir}/meta.json`
+
+    const metadata = {
+      namedIds: this.#recipeManager.getGeneratedNamedIds(),
+    }
+    writeFileSync(outputFilePath, JSON.stringify(metadata, null, 2))
+  }
 }

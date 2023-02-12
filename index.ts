@@ -30,6 +30,7 @@ program.command('generate')
   .option('--debug', 'Enable debug logging')
   .option('--metadata-output <filePath>', 'Path for the exported metadata file', 'exports.json')
   .option('-p, --output-file-prefix <start>', 'The initial value to use for prefixes in exported SQL file names')
+  .option('-s, --sql-dialect <start>', 'The type of SQL to generate (e.g. "mysql")')
   .option('-d, --output-dir <filePath>', 'Directory for the exported SQL and metadata files')
   .option('-r, --recipes-dir <directory>', 'Path to the directory containing recipes')
   .action(async (options: Config) => {
@@ -63,6 +64,10 @@ program.command('generate')
       program.error('No recipes directory provided, cannot find any recipes')
     }
 
+    if (mergedOptions.sqlDialect === undefined) {
+      program.error('No SQL dialect provided, please specify which dialect to output')
+    }
+
     const resolvedRecipesDir = resolve(mergedOptions.recipesDir)
 
     const recipeManager = new RecipeManager()
@@ -80,6 +85,7 @@ program.command('generate')
 
     const exportGenerator = new ExportGenerator(recipeFilePaths, recipeManager, {
       outputDir: resolvedOutputDir,
+      sqlDialect: mergedOptions.sqlDialect,
       startPrefix: exportPrefix,
       logger,
     })

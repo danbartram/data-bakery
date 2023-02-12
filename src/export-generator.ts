@@ -7,6 +7,7 @@ import { sqlForRecipeBundle } from './utils/sql-generator'
 
 export type ExporterConfig = {
   outputDir: string
+  sqlDialect: string
   startPrefix?: number
   logger?: Logger
 }
@@ -19,6 +20,7 @@ export class ExportGenerator {
   #recipeFilePaths: string[]
   #recipeManager: RecipeManager
   #outputDir: string
+  #sqlDialect: string
   #startPrefix?: number
   #logger?: Logger
   #exportedFilesCount: number = 0
@@ -27,6 +29,7 @@ export class ExportGenerator {
     this.#recipeFilePaths = recipeFilePaths
     this.#recipeManager = recipeManager
     this.#outputDir = config.outputDir
+    this.#sqlDialect = config.sqlDialect
     this.#startPrefix = config.startPrefix
     this.#logger = config.logger
   }

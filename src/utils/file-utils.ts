@@ -22,6 +22,7 @@ export type Config = {
   outputFile?: string
   outputDir?: string
   exportPrefixStart?: string
+  sqlDialect?: string
 }
 
 /**

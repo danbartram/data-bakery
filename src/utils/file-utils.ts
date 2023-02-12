@@ -23,6 +23,7 @@ export type Config = {
   outputDir?: string
   exportPrefixStart?: string
   sqlDialect?: string
+  recipeContext?: () => object
 }
 
 /**

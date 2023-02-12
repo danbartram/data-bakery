@@ -83,9 +83,14 @@ program.command('generate')
       ? Number.parseInt(mergedOptions.exportPrefixStart)
       : undefined
 
+    const recipeContext = typeof mergedOptions.recipeContext === 'function'
+      ? mergedOptions.recipeContext()
+      : {}
+
     const exportGenerator = new ExportGenerator(recipeFilePaths, recipeManager, {
       outputDir: resolvedOutputDir,
       sqlDialect: mergedOptions.sqlDialect,
+      recipeContext,
       startPrefix: exportPrefix,
       logger,
     })

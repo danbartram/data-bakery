@@ -8,6 +8,7 @@ import { sqlForRecipeBundle } from './utils/sql-generator'
 export type ExporterConfig = {
   outputDir: string
   sqlDialect: string
+  recipeContext?: object
   startPrefix?: number
   logger?: Logger
 }
@@ -21,6 +22,7 @@ export class ExportGenerator {
   #recipeManager: RecipeManager
   #outputDir: string
   #sqlDialect: string
+  #recipeContext?: object
   #startPrefix?: number
   #logger?: Logger
   #exportedFilesCount: number = 0
@@ -30,6 +32,7 @@ export class ExportGenerator {
     this.#recipeManager = recipeManager
     this.#outputDir = config.outputDir
     this.#sqlDialect = config.sqlDialect
+    this.#recipeContext = config.recipeContext
     this.#startPrefix = config.startPrefix
     this.#logger = config.logger
   }
@@ -48,7 +51,11 @@ export class ExportGenerator {
     if (typeof recipeExport === 'object') {
       recipeBundle = recipeExport
     } else if (typeof recipeExport === 'function') {
-      recipeBundle = recipeExport()
+      const recipeContext = {
+        ...this.#recipeContext,
+        sqlDialect: this.#sqlDialect,
+      }
+      recipeBundle = recipeExport(recipeContext)
     } else {
       throw new Error(`Recipe '${inputRecipePath}' exported an unsupported type, please check it is exporting a function or an object`)
     }

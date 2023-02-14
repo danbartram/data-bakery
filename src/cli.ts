@@ -1,10 +1,11 @@
+#!/usr/bin/env node
 import { program } from 'commander'
 import winston from 'winston'
 import { existsSync, mkdirSync } from 'fs'
 import { resolve } from 'path'
-import { RecipeManager } from './src/recipe-manager'
-import { type Config, getRecipeFilePaths } from './src/utils/file-utils'
-import { ExportGenerator } from './src/export-generator'
+import { type Config, getRecipeFilePaths } from './utils/file-utils'
+import { ExportGenerator } from './export-generator'
+import { RecipeManager } from './recipe-manager'
 
 const logTransports = {
   console: new winston.transports.Console(),

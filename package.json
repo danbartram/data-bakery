@@ -2,9 +2,12 @@
   "name": "data-bakery",
   "version": "0.0.1",
   "description": "A tool to prepare test data",
-  "main": "index.js",
+  "main": "recipe-helper.js",
   "scripts": {
     "test": "jest"
+  },
+  "bin": {
+    "data-bakery": "./cli.js"
   },
   "author": "Dan Bartram",
   "license": "MIT",

@@ -67,3 +67,27 @@ test('Check customer with no orders returns empty array', () => {
 ```
 
 You don't need to keep track of specific IDsm or worry about the ordering of `INSERT` statements anymore.
+
+---
+
+## Build steps
+
+To build as a local NPM package:
+
+```bash
+# Install dependencies
+npm ci
+# Compile TS and generate .d.ts types
+npx tsc
+# Copy the package.json into dist to avoid needing `dist` in imports
+cp package.json ./dist/
+
+# Build a local package in the root directory
+cd dist && npm pack --pack-destination ../
+```
+
+You can then install the package in another local project like this:
+
+```bash
+npm i /path/to/data-bakery-0.0.1.tgz
+```

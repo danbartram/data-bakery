@@ -81,9 +81,10 @@ npm ci
 npx tsc
 # Copy the package.json into dist to avoid needing `dist` in imports
 cp package.json ./dist/
+cp .npmignore ./dist/
 
 # Build a local package in the root directory
-cd dist && npm pack --pack-destination ../
+(cd dist && npm pack --pack-destination ../)
 ```
 
 You can then install the package in another local project like this:

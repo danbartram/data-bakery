@@ -55,7 +55,7 @@ export class ExportGenerator {
         ...this.#recipeContext,
         sqlDialect: this.#sqlDialect,
       }
-      recipeBundle = recipeExport(recipeContext)
+      recipeBundle = await recipeExport(recipeContext)
     } else {
       throw new Error(`Recipe '${inputRecipePath}' exported an unsupported type, please check it is exporting a function or an object`)
     }

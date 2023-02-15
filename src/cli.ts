@@ -52,7 +52,7 @@ program.command('generate')
       logger.debug(`The output directory: '${resolvedOutputDir}' does not exist, creating`)
 
       try {
-        mkdirSync(resolvedOutputDir)
+        mkdirSync(resolvedOutputDir, { recursive: true })
       } catch (e) {
         logger.error(e)
         program.error(`Failed to create new output directory: '${resolvedOutputDir}'`)

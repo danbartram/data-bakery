@@ -1,5 +1,5 @@
-import { RawSQL } from '../recipe-helper'
-import { groupRowsByColumns, sqlForRecipeBundle } from './sql-generator'
+import { RawSQL } from '../../../src/recipe-helper'
+import { groupRowsByColumns, sqlForRecipeBundle } from '../../../src/utils/sql-generator'
 
 describe('sql-generator', () => {
   describe('sqlForRecipeBundle', () => {

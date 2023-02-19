@@ -114,7 +114,7 @@ async function getMergedOptions (options: Config): Promise<Config> {
 
   if (typeof options.config === 'string') {
     try {
-      configFileOptions = await import(resolve(options.config))
+      configFileOptions = (await import(resolve(options.config))).default()
     } catch (e) {
       program.error(`Failed to load config file at path: '${options.config}'`)
     }

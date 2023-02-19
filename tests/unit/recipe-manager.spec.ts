@@ -1,4 +1,4 @@
-import { AutoIncId, NamedId, NamedIdForTable } from '../../src/recipe-helper'
+import { AutoIncId, getNamedId, NamedId } from '../../src/recipe-helper'
 import { RecipeManager, type RecipeBundle } from '../../src/recipe-manager'
 
 describe('prepareRecipe', () => {
@@ -124,34 +124,29 @@ describe('prepareRecipe', () => {
   })
 
   it('generates named IDs correctly', () => {
-    const specialUserId = new NamedId('specialUser')
-    const anotherSpecialUserId = new NamedId('someOtherName')
-
     const recipeBundle = {
       user: [
         { id: new AutoIncId(), email: 'hi@there.com', firstName: 'Eric' },
-        { id: specialUserId, email: 'alice@test.com', firstName: 'Alice' },
+        { id: new NamedId('specialUser'), email: 'alice@test.com', firstName: 'Alice' },
         { id: new AutoIncId(), email: 'bob@example.com', firstName: 'Bob' },
-        { id: anotherSpecialUserId, email: 'another@one.com', firstName: 'Another' },
+        { id: new NamedId('someOtherName'), email: 'another@one.com', firstName: 'Another' },
       ],
       orders: [
-        { userId: specialUserId, productId: new NamedId('myProduct'), amount: 5 },
-        { userId: specialUserId, productId: 2, amount: 3 },
+        { userId: getNamedId('user', 'specialUser'), productId: new NamedId('myProduct'), amount: 5 },
+        { userId: getNamedId('user', 'someOtherName'), productId: new AutoIncId(), amount: 3 },
       ],
     }
 
     const expectedResult = {
       user: [
         { id: 1, email: 'hi@there.com', firstName: 'Eric' },
-        { id: 100000, email: 'alice@test.com', firstName: 'Alice' },
-        { id: 2, email: 'bob@example.com', firstName: 'Bob' },
-        { id: 100001, email: 'another@one.com', firstName: 'Another' },
+        { id: 2, email: 'alice@test.com', firstName: 'Alice' },
+        { id: 3, email: 'bob@example.com', firstName: 'Bob' },
+        { id: 4, email: 'another@one.com', firstName: 'Another' },
       ],
       orders: [
-        // The name IDs should be incremented on a per-table basis,
-        // both the first named user ID and first named product ID will match here
-        { userId: 100000, productId: 100000, amount: 5 },
-        { userId: 100000, productId: 2, amount: 3 },
+        { userId: 2, productId: 1, amount: 5 },
+        { userId: 4, productId: 2, amount: 3 },
       ],
     }
 
@@ -160,36 +155,43 @@ describe('prepareRecipe', () => {
     expect(preparedBundle).toEqual(expectedResult)
   })
 
-  it('generates the same named ID value for duplicate NamedId instances', () => {
-    const specialUserId = new NamedId('specialUser')
-
+  it('getNamedId uses placeholder values if it has not been defined yet', () => {
     const recipeBundle = {
-      user: [
-        { id: new AutoIncId(), email: 'hi@there.com', firstName: 'Eric' },
-        { id: specialUserId, email: 'alice@test.com', firstName: 'Alice' },
-        { id: new AutoIncId(), email: 'bob@example.com', firstName: 'Bob' },
-      ],
       orders: [
-        { userId: new NamedId('specialUser'), productId: 1, amount: 5 },
-        { userId: new NamedId('specialUser'), productId: 2, amount: 3 },
+        // Use the named ID before it's been defined in the user table
+        { userId: getNamedId('user', 'specialUser'), productId: new NamedId('myProduct'), amount: 5 },
+        { userId: getNamedId('user', 'specialUser'), productId: new AutoIncId(), amount: 3 },
+      ],
+      user: [
+        { id: new NamedId('specialUser'), email: 'alice@test.com', firstName: 'Alice' },
       ],
     }
 
     const expectedResult = {
-      user: [
-        { id: 1, email: 'hi@there.com', firstName: 'Eric' },
-        { id: 100000, email: 'alice@test.com', firstName: 'Alice' },
-        { id: 2, email: 'bob@example.com', firstName: 'Bob' },
-      ],
       orders: [
-        { userId: 100000, productId: 1, amount: 5 },
-        { userId: 100000, productId: 2, amount: 3 },
+        { userId: 1, productId: 1, amount: 5 },
+        { userId: 1, productId: 2, amount: 3 },
+      ],
+      user: [
+        { id: 1, email: 'alice@test.com', firstName: 'Alice' },
       ],
     }
 
     const manager = new RecipeManager()
-    const preparedRecipe = manager.prepareRecipe(recipeBundle)
-    expect(preparedRecipe).toEqual(expectedResult)
+    const preparedBundle = manager.prepareRecipe(recipeBundle)
+    expect(preparedBundle).toEqual(expectedResult)
+  })
+
+  it('throws if duplicate NamedId is created', () => {
+    const recipeBundle = {
+      orders: [
+        { userId: new NamedId('duplicate'), amount: 5 },
+        { userId: new NamedId('duplicate'), amount: 10 },
+      ],
+    }
+
+    const manager = new RecipeManager()
+    expect(() => { manager.prepareRecipe(recipeBundle) }).toThrow()
   })
 
   it('exports generated named IDs correctly', () => {
@@ -201,18 +203,18 @@ describe('prepareRecipe', () => {
         { id: new NamedId('someOtherUser'), email: 'another@one.com', firstName: 'Another' },
       ],
       orders: [
-        { userId: new NamedIdForTable('user', 'someUser'), productId: new NamedId('myProduct'), amount: 5 },
-        { userId: new NamedIdForTable('user', 'someUser'), productId: new AutoIncId(), amount: 3 },
+        { userId: getNamedId('user', 'someUser'), productId: new NamedId('myProduct'), amount: 5 },
+        { userId: getNamedId('user', 'someOtherUser'), productId: new AutoIncId(), amount: 3 },
       ],
     }
 
     const expectedIdMap = {
       user: {
-        someUser: { id: 100000 },
-        someOtherUser: { id: 100001 },
+        someUser: { id: 2 },
+        someOtherUser: { id: 4 },
       },
       orders: {
-        myProduct: { id: 100000 },
+        myProduct: { id: 1 },
       },
     }
 

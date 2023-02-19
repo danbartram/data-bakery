@@ -13,8 +13,7 @@ export class AutoIncId {
 
 /**
  * A convenience class to reference a specific ID with a descriptive name.
- * This can be used to generate special cases, and allow you to easily reference them
- * again later with a NamedIdForTable instance.
+ * You can read a generated named ID with getNamedId().
  *
  * For example, a `productWithRefund` named ID.
  */
@@ -30,19 +29,18 @@ export class NamedId {
   }
 }
 
-/**
- * A wrapper for `NamedId` to allow accessing the ID from within a different
- * table recipe to where it's defined.
- */
-export class NamedIdForTable extends NamedId {
+export class NamedIdPlaceholder {
   /** The name of the table where the NamedId instance exists */
   tableName: TableName
+  idName: NamedIdName
 
-  constructor (tableName: TableName, name: NamedIdName) {
-    super(name)
+  constructor (tableName: TableName, idName: NamedIdName) {
     this.tableName = tableName
+    this.idName = idName
   }
 }
+
+export const getNamedId = (tableName: TableName, idName: NamedIdName): NamedIdPlaceholder => new NamedIdPlaceholder(tableName, idName)
 
 export class RawSQL {
   rawValue: string

@@ -1,4 +1,4 @@
-import { AutoIncId, NamedId, NamedIdForTable, type NamedIdName } from './recipe-helper'
+import { AutoIncId, NamedId, NamedIdPlaceholder, type NamedIdName } from './recipe-helper'
 
 export type TableName = string
 export type ColumnName = string
@@ -18,6 +18,14 @@ export type ColumnName = string
  * }
  */
 export type RecipeBundle = Record<TableName, Array<Record<ColumnName, any>>>
+
+/** Metadata for named IDs during the processing steps */
+export type NamedIdStatus = {
+  /** The automatically generated ID value */
+  idValue: number
+  /** Identify whether this named ID has only been used via `getNamedId` and not has been defined yet */
+  isPlaceholder: boolean
+}
 
 /** The object nested under the ID's name in the export */
 export type NamedIdExport = {
@@ -43,12 +51,9 @@ export class RecipeManager {
   /** A map containing the latest AUTO INCREMENT value, keyed by table name */
   #tableAutoIncIds: Record<TableName, number> = {}
   /** A map containing all of the unique named IDs in each table, keyed by table name */
-  #tableNamedIds: Record<TableName, Set<NamedIdName>> = {}
+  #tableNamedIds: Record<TableName, Map<NamedIdName, NamedIdStatus>> = {}
   /** A map containing functions to generate default row values, keyed by table name */
   #tableDefaults: TableDefaults = {}
-
-  /** The first ID value to use with named IDs */
-  #namedIdRangeStart = 100000
 
   constructor (config: RecipeManagerConfig = {}) {
     if (config.tableDefaults !== undefined) {
@@ -59,7 +64,7 @@ export class RecipeManager {
   /**
    * Generate and retrieve the next AUTO INCREMENT ID value to use for a table.
    */
-  #generateAutoIncForTable (tableName: TableName): number {
+  #generateNextAutoIncForTable (tableName: TableName): number {
     let nextAutoIncId = 1
 
     if (this.#tableAutoIncIds[tableName] !== undefined) {
@@ -73,17 +78,28 @@ export class RecipeManager {
   /**
    * Generate and retrieve the generated ID value for a given named ID.
    */
-  #generateNamedIdForTable (tableName: TableName, idName: NamedIdName): number {
+  #generateNamedIdForTable (tableName: TableName, idName: NamedIdName, isPlaceholder: boolean = false): number {
     if (!(tableName in this.#tableNamedIds)) {
-      this.#tableNamedIds[tableName] = new Set()
+      this.#tableNamedIds[tableName] = new Map()
     }
 
-    this.#tableNamedIds[tableName].add(idName)
+    const namedIdStatus = this.#tableNamedIds[tableName].get(idName)
 
-    // This allows duplicate named IDs to be defined/reused
-    const indexOfIdName = Array.from(this.#tableNamedIds[tableName]).findIndex(existingName => existingName === idName)
+    // This is the first time this ID name has been used, generate a new value
+    if (namedIdStatus === undefined) {
+      const nextId = this.#generateNextAutoIncForTable(tableName)
+      this.#tableNamedIds[tableName].set(idName, {
+        isPlaceholder,
+        idValue: nextId,
+      })
+      return nextId
+    }
 
-    return this.#namedIdRangeStart + indexOfIdName
+    if (!isPlaceholder && !namedIdStatus.isPlaceholder) {
+      throw new Error(`Named ID: '${idName}' for table: '${tableName}' has been defined multiple times. Use getNamedId() to read values`)
+    }
+
+    return namedIdStatus.idValue
   }
 
   /**
@@ -98,9 +114,9 @@ export class RecipeManager {
     for (const tableName of Object.keys(this.#tableNamedIds)) {
       result[tableName] = {}
 
-      for (const namedId of this.#tableNamedIds[tableName]) {
-        result[tableName][namedId] = {
-          id: this.#generateNamedIdForTable(tableName, namedId),
+      for (const [idName, namedIdStatus] of this.#tableNamedIds[tableName]) {
+        result[tableName][idName] = {
+          id: namedIdStatus.idValue,
         }
       }
     }
@@ -157,18 +173,13 @@ export class RecipeManager {
         const autoIncId: AutoIncId = processedRow[columnName]
 
         if (autoIncId.value === undefined) {
-          autoIncId.value = this.#generateAutoIncForTable(tableName)
+          autoIncId.value = this.#generateNextAutoIncForTable(tableName)
         }
 
         processedRow[columnName] = autoIncId.value
-      } else if (processedRow[columnName] instanceof NamedIdForTable) {
-        const namedIdForTable: NamedIdForTable = processedRow[columnName]
-
-        if (namedIdForTable.value === undefined) {
-          namedIdForTable.value = this.#generateNamedIdForTable(namedIdForTable.tableName, namedIdForTable.name)
-        }
-
-        processedRow[columnName] = namedIdForTable.value
+      } else if (processedRow[columnName] instanceof NamedIdPlaceholder) {
+        const namedIdPlaceholder: NamedIdPlaceholder = processedRow[columnName]
+        processedRow[columnName] = this.#generateNamedIdForTable(namedIdPlaceholder.tableName, namedIdPlaceholder.idName, true)
       } else if (processedRow[columnName] instanceof NamedId) {
         const namedId: NamedId = processedRow[columnName]
 

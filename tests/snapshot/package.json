@@ -1,0 +1,7 @@
+{
+  "name": "data-bakery-snapshot-tests",
+  "version": "1.0.0",
+  "dependencies": {
+    "data-bakery": "file:../../data-bakery-0.0.1.tgz"
+  }
+}

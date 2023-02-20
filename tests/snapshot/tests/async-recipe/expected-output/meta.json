@@ -1,0 +1,12 @@
+{
+  "namedIds": {
+    "user": {
+      "helloWorld": {
+        "id": 1
+      },
+      "anotherHelloWorld": {
+        "id": 2
+      }
+    }
+  }
+}

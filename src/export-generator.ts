@@ -97,6 +97,6 @@ export class ExportGenerator {
     const metadata = {
       namedIds: this.#recipeManager.getGeneratedNamedIds(),
     }
-    writeFileSync(outputFilePath, JSON.stringify(metadata, null, 2))
+    writeFileSync(outputFilePath, JSON.stringify(metadata, null, 2) + '\n')
   }
 }

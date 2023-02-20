@@ -38,7 +38,7 @@ export function sqlForRecipeBundle (recipeBundle: RecipeBundle, config: SQLGener
     })
   })
 
-  return sqlQueries.join('\n')
+  return sqlQueries.join('\n') + '\n'
 }
 
 /**

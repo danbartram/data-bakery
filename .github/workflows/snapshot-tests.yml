@@ -1,0 +1,13 @@
+name: Snapshot tests
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./tests/snapshot/scripts/run-docker-tests.sh

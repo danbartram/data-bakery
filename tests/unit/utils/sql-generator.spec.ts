@@ -11,7 +11,7 @@ describe('sql-generator', () => {
         ],
       })
 
-      expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter'), (2, 'Paul');")
+      expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter'), (2, 'Paul');\n")
     })
     it('outputs batched sql up to batchSize', () => {
       const sql = sqlForRecipeBundle({
@@ -22,7 +22,7 @@ describe('sql-generator', () => {
         ],
       }, { batchSize: 2 })
 
-      expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter'), (2, 'Paul');\nINSERT INTO `user` (id,name) VALUES (3, 'Testing');")
+      expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter'), (2, 'Paul');\nINSERT INTO `user` (id,name) VALUES (3, 'Testing');\n")
     })
     it('avoids batching different column groups', () => {
       const sql = sqlForRecipeBundle({
@@ -32,7 +32,7 @@ describe('sql-generator', () => {
         ],
       })
 
-      expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter');\nINSERT INTO `user` (id,name,extraColumn) VALUES (2, 'Paul', 'something');")
+      expect(sql).toBe("INSERT INTO `user` (id,name) VALUES (1, 'Peter');\nINSERT INTO `user` (id,name,extraColumn) VALUES (2, 'Paul', 'something');\n")
     })
     it('outputs escaped sql', () => {
       const sql = sqlForRecipeBundle({
@@ -41,7 +41,7 @@ describe('sql-generator', () => {
         ],
       })
 
-      expect(sql).toBe("INSERT INTO `user` (id,name,extra) VALUES (1, 'Bobby''s tables''''\\', 'It''s all \"groovy\"');")
+      expect(sql).toBe("INSERT INTO `user` (id,name,extra) VALUES (1, 'Bobby''s tables''''\\', 'It''s all \"groovy\"');\n")
     })
     it('handles NULL data values', () => {
       const sql = sqlForRecipeBundle({
@@ -50,7 +50,7 @@ describe('sql-generator', () => {
         ],
       })
 
-      expect(sql).toBe('INSERT INTO `user` (id,name) VALUES (1, NULL);')
+      expect(sql).toBe('INSERT INTO `user` (id,name) VALUES (1, NULL);\n')
     })
     it('handles RawSQL values', () => {
       const sql = sqlForRecipeBundle({
@@ -59,7 +59,7 @@ describe('sql-generator', () => {
         ],
       })
 
-      expect(sql).toBe('INSERT INTO `user` (id,name,created) VALUES (1, NULL, CURDATE());')
+      expect(sql).toBe('INSERT INTO `user` (id,name,created) VALUES (1, NULL, CURDATE());\n')
     })
   })
 

@@ -13,7 +13,9 @@ cp package.json ./dist/
 cp .npmignore ./dist/
 
 echo "Building package"
-(cd dist && npm pack --pack-destination ../)
+(cd dist && npm pack)
+
+mv dist/data-bakery-*.tgz ./
 
 BUILT_PACK_PATH=$(realpath data-bakery-*.tgz)
 echo "FOUND PACKAGE: ${BUILT_PACK_PATH}"

@@ -21,6 +21,7 @@ export type Config = {
   metadataOutput?: string
   outputFile?: string
   outputDir?: string
+  emptyOutputDir?: boolean
   exportPrefixStart?: string
   sqlDialect?: string
   recipeContext?: () => object

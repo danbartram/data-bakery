@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { program } from 'commander'
 import winston from 'winston'
-import { existsSync, mkdirSync } from 'fs'
+import { existsSync, mkdirSync, readdirSync, rmSync } from 'fs'
 import { resolve } from 'path'
 import { type Config, getRecipeFilePaths } from './utils/file-utils'
 import { ExportGenerator } from './export-generator'
@@ -59,7 +59,16 @@ program.command('generate')
       }
     }
 
-    // TODO: Check if output dir already has exports in it, tidy up first?
+    const filesInOutputDir = readdirSync(resolvedOutputDir)
+
+    if (filesInOutputDir.length > 0) {
+      if (mergedOptions.emptyOutputDir === true) {
+        logger.debug(`Removing ${filesInOutputDir.length} files from output directory`)
+        filesInOutputDir.forEach(fileName => { rmSync(`${resolvedOutputDir}/${fileName}`, { recursive: true }) })
+      } else {
+        logger.warn('Output directory is not empty, it may contain stale output files')
+      }
+    }
 
     if (mergedOptions.recipesDir === undefined) {
       program.error('No recipes directory provided, cannot find any recipes')

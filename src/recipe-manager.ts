@@ -36,11 +36,15 @@ export type NamedIdExport = {
 export type NamedIdExportMap = Record<TableName, Record<NamedIdName, NamedIdExport>>
 
 /** An object containing table names as keys, with the values as functions which return column values in a nested object */
-export type TableDefaults = Record<TableName, () => Record<ColumnName, any>>
+export type TableDefaultsConfig = Record<TableName, () => Record<ColumnName, any>>
+
+/** An object containing table names as keys, with the values as the first AUTO INCREMENT ID value to use  */
+export type TableStartIdsConfig = Record<TableName, number>
 
 /** The config options available for the RecipeManager */
 export type RecipeManagerConfig = {
-  tableDefaults?: TableDefaults
+  tableDefaults?: TableDefaultsConfig
+  tableStartIds?: TableStartIdsConfig
 }
 
 /**
@@ -53,11 +57,16 @@ export class RecipeManager {
   /** A map containing all of the unique named IDs in each table, keyed by table name */
   #tableNamedIds: Record<TableName, Map<NamedIdName, NamedIdStatus>> = {}
   /** A map containing functions to generate default row values, keyed by table name */
-  #tableDefaults: TableDefaults = {}
+  #tableDefaults: TableDefaultsConfig = {}
+  #tableStartIds: TableStartIdsConfig = {}
 
   constructor (config: RecipeManagerConfig = {}) {
     if (config.tableDefaults !== undefined) {
       this.#tableDefaults = config.tableDefaults
+    }
+
+    if (config.tableStartIds !== undefined) {
+      this.#tableStartIds = config.tableStartIds
     }
   }
 
@@ -65,7 +74,7 @@ export class RecipeManager {
    * Generate and retrieve the next AUTO INCREMENT ID value to use for a table.
    */
   #generateNextAutoIncForTable (tableName: TableName): number {
-    let nextAutoIncId = 1
+    let nextAutoIncId = this.#tableStartIds[tableName] ?? 1
 
     if (this.#tableAutoIncIds[tableName] !== undefined) {
       nextAutoIncId = this.#tableAutoIncIds[tableName] + 1

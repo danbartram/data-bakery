@@ -25,6 +25,8 @@ export type Config = {
   exportPrefixStart?: string
   sqlDialect?: string
   recipeContext?: () => object
+  tableDefaults?: Record<string, () => object>
+  tableStartIds?: Record<string, number>
 }
 
 /**

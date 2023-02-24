@@ -109,16 +109,20 @@ describe('prepareRecipe', () => {
         { id: 1, email: 'hi@there.com', firstName: 'Eric' },
       ],
       products: [
-        { productId: 1, name: 'Bread' },
-        { productId: 2, name: 'Cheese' },
+        { productId: 501, name: 'Bread' },
+        { productId: 502, name: 'Cheese' },
       ],
       orders: [
-        { userId: 1, productId: 1, amount: 5 },
-        { userId: 1, productId: 2, amount: 3 },
+        { userId: 1, productId: 501, amount: 5 },
+        { userId: 1, productId: 502, amount: 3 },
       ],
     }
 
-    const manager = new RecipeManager()
+    const manager = new RecipeManager({
+      tableStartIds: {
+        products: 501,
+      },
+    })
     const preparedRecipe = manager.prepareRecipe(recipeBundle)
     expect(preparedRecipe).toEqual(expectedResult)
   })

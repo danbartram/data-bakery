@@ -80,7 +80,10 @@ program.command('generate')
 
     const resolvedRecipesDir = resolve(mergedOptions.recipesDir)
 
-    const recipeManager = new RecipeManager()
+    const recipeManager = new RecipeManager({
+      tableDefaults: mergedOptions.tableDefaults,
+      tableStartIds: mergedOptions.tableStartIds,
+    })
     const recipeFilePaths = getRecipeFilePaths(resolvedRecipesDir)
 
     logger.info(`Found ${recipeFilePaths.length} recipe(s) in '${resolvedRecipesDir}'`)

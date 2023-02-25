@@ -27,20 +27,18 @@ program
 
 program.command('generate')
   .description('Generate an SQL file')
-  .option('--config <filePath>', 'Path to the config file')
+  .argument('[config-file]', 'Path to a data-bakery.config.js file', 'data-bakery.config.js')
   .option('--debug', 'Enable debug logging')
-  .option('--metadata-output <filePath>', 'Path for the exported metadata file', 'exports.json')
-  .option('-p, --output-file-prefix <start>', 'The initial value to use for prefixes in exported SQL file names')
   .option('-s, --sql-dialect <start>', 'The type of SQL to generate (e.g. "mysql")')
   .option('-d, --output-dir <filePath>', 'Directory for the exported SQL and metadata files')
   .option('-r, --recipes-dir <directory>', 'Path to the directory containing recipes')
-  .action(async (options: Config) => {
+  .action(async (configFile: any, options: Config) => {
     if (options.debug === true) {
       logTransports.console.level = 'debug'
     }
 
     // Allow options in the CLI to override the config file
-    const mergedOptions = await getMergedOptions(options)
+    const mergedOptions = await getMergedOptions(options, configFile)
 
     if (mergedOptions.outputDir === undefined) {
       program.error('Please provide an output directory with --output-dir')
@@ -92,18 +90,18 @@ program.command('generate')
       logger.debug(`Recipe files: ${recipeFilePaths.join(', ')}`)
     }
 
-    const exportPrefix = mergedOptions.exportPrefixStart !== undefined
-      ? Number.parseInt(mergedOptions.exportPrefixStart)
+    const exportPrefix = mergedOptions.outputPrefixStart !== undefined
+      ? Number.parseInt(mergedOptions.outputPrefixStart)
       : undefined
 
-    const recipeContext = typeof mergedOptions.recipeContext === 'function'
-      ? mergedOptions.recipeContext()
+    const extraRecipeContext = typeof mergedOptions.extraRecipeContext === 'function'
+      ? mergedOptions.extraRecipeContext()
       : {}
 
     const exportGenerator = new ExportGenerator(recipeFilePaths, recipeManager, {
       outputDir: resolvedOutputDir,
       sqlDialect: mergedOptions.sqlDialect,
-      recipeContext,
+      extraRecipeContext,
       startPrefix: exportPrefix,
       logger,
     })
@@ -121,21 +119,21 @@ program.parse()
  *
  * This allows for using a config file with specific optional overrides at runtime.
  */
-async function getMergedOptions (options: Config): Promise<Config> {
+async function getMergedOptions (options: Config, configFile: string): Promise<Config> {
   let configFileOptions: Config | null = null
 
-  if (typeof options.config === 'string') {
+  if (typeof configFile === 'string') {
     try {
-      configFileOptions = (await import(resolve(options.config))).default()
+      configFileOptions = (await import(resolve(configFile))).default()
     } catch (e) {
-      program.error(`Failed to load config file at path: '${options.config}'`)
+      program.error(`Failed to load config file at path: '${configFile}'`)
     }
 
     if (configFileOptions === null) {
-      program.error(`No config file found at path: '${options.config}'`)
+      program.error(`No config file found at path: '${configFile}'`)
     }
 
-    logger.info(`Imported config from: '${options.config}'`)
+    logger.info(`Imported config from: '${configFile}'`)
   }
 
   return { ...configFileOptions, ...options }

@@ -3,5 +3,5 @@ module.exports = () => ({
   sqlDialect: 'mysql',
   outputDir: 'actual-output',
   emptyOutputDir: true,
-  exportPrefixStart: '10',
+  outputPrefixStart: '10',
 })

@@ -17,14 +17,11 @@ export function getExportFileNameFromRecipePath (recipePath: string): string {
 export type Config = {
   debug?: boolean
   recipesDir?: string
-  config?: string
-  metadataOutput?: string
-  outputFile?: string
   outputDir?: string
   emptyOutputDir?: boolean
-  exportPrefixStart?: string
+  outputPrefixStart?: string
   sqlDialect?: string
-  recipeContext?: () => object
+  extraRecipeContext?: () => object
   tableDefaults?: Record<string, () => object>
   tableStartIds?: Record<string, number>
 }

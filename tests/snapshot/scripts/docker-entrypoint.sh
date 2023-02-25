@@ -10,7 +10,7 @@ for testDir in tests/*/ ; do
     echo "Starting test for: ${testDir}"
     cd "/code/tests/snapshot/${testDir}"
 
-    npx data-bakery generate --config data-bakery.config.js --debug
+    npx data-bakery generate --debug
     GENERATE_EXIT_CODE=$?
 
     if [ $GENERATE_EXIT_CODE -ne 0 ]; then

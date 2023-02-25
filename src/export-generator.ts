@@ -8,7 +8,7 @@ import { sqlForRecipeBundle } from './utils/sql-generator'
 export type ExporterConfig = {
   outputDir: string
   sqlDialect: string
-  recipeContext?: object
+  extraRecipeContext?: object
   startPrefix?: number
   logger?: Logger
 }
@@ -22,7 +22,7 @@ export class ExportGenerator {
   #recipeManager: RecipeManager
   #outputDir: string
   #sqlDialect: string
-  #recipeContext?: object
+  #extraRecipeContext?: object
   #startPrefix?: number
   #logger?: Logger
   #exportedFilesCount: number = 0
@@ -32,7 +32,7 @@ export class ExportGenerator {
     this.#recipeManager = recipeManager
     this.#outputDir = config.outputDir
     this.#sqlDialect = config.sqlDialect
-    this.#recipeContext = config.recipeContext
+    this.#extraRecipeContext = config.extraRecipeContext
     this.#startPrefix = config.startPrefix
     this.#logger = config.logger
   }
@@ -52,7 +52,7 @@ export class ExportGenerator {
       recipeBundle = recipeExport
     } else if (typeof recipeExport === 'function') {
       const recipeContext = {
-        ...this.#recipeContext,
+        ...this.#extraRecipeContext,
         sqlDialect: this.#sqlDialect,
       }
       recipeBundle = await recipeExport(recipeContext)

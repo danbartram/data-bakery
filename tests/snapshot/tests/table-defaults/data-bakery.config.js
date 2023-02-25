@@ -3,7 +3,7 @@ module.exports = () => ({
   sqlDialect: 'mysql',
   outputDir: 'actual-output',
   emptyOutputDir: true,
-  exportPrefixStart: '10',
+  outputPrefixStart: '10',
   tableDefaults: {
     user: () => ({
       extra1: 'column-value-here',

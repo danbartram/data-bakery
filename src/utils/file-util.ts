@@ -1,7 +1,6 @@
-import { readFileSync, readdirSync, rmSync } from 'fs'
+import { readdirSync, readFileSync } from 'fs'
 import glob from 'glob'
 import { resolve } from 'path'
-import { type Logger } from 'winston'
 
 export function getExportFileNameFromRecipePath (recipePath: string): string {
   // TODO: Maybe this should keep the structure inside the recipes dir, e.g.

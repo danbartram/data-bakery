@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import { program } from 'commander'
-import winston from 'winston'
-import { existsSync, mkdirSync, readdirSync, rmSync } from 'fs'
+import { existsSync, mkdirSync, rmSync } from 'fs'
 import { resolve } from 'path'
-import { type Config, getRecipeFilePaths } from './utils/file-utils'
+import winston from 'winston'
 import { ExportGenerator } from './export-generator'
 import { RecipeManager } from './recipe-manager'
+import { getRecipeFilePaths, getOutputFilesToRemove, type Config } from './utils/file-util'
 
 const logTransports = {
   console: new winston.transports.Console(),
@@ -57,15 +57,10 @@ program.command('generate')
       }
     }
 
-    const filesInOutputDir = readdirSync(resolvedOutputDir)
-
-    if (filesInOutputDir.length > 0) {
-      if (mergedOptions.emptyOutputDir === true) {
-        logger.debug(`Removing ${filesInOutputDir.length} files from output directory`)
-        filesInOutputDir.forEach(fileName => { rmSync(`${resolvedOutputDir}/${fileName}`, { recursive: true }) })
-      } else {
-        logger.warn('Output directory is not empty, it may contain stale output files')
-      }
+    if (mergedOptions.emptyOutputDir === true) {
+      const filesToRemove: string[] = getOutputFilesToRemove(resolvedOutputDir)
+      logger.verbose(`Found ${filesToRemove.length} files to remove from output directory`)
+      filesToRemove.forEach(filePath => { rmSync(`${resolvedOutputDir}/${filePath}`, { recursive: true }) })
     }
 
     if (mergedOptions.recipesDir === undefined) {

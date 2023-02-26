@@ -1,0 +1,6 @@
+# Keep our schema between generations
+00-schema.sql
+
+# Keep a single file and a whole directory
+some-file.txt
+other-stuff/

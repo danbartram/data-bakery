@@ -2,7 +2,7 @@
 import { writeFileSync } from 'fs'
 import { type Logger } from 'winston'
 import { type RecipeManager } from './recipe-manager'
-import { getExportFileNameFromRecipePath } from './utils/file-utils'
+import { getExportFileNameFromRecipePath } from './utils/file-util'
 import { sqlForRecipeBundle } from './utils/sql-generator'
 
 export type ExporterConfig = {

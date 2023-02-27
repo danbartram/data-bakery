@@ -29,5 +29,16 @@
     "commander": "^10.0.0",
     "glob": "^8.1.0",
     "winston": "^3.8.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/danbartram/data-bakery.git"
+  },
+  "keywords": [
+    "test data",
+    "text fixtures",
+    "sql",
+    "mysql",
+    "testing"
+  ]
 }

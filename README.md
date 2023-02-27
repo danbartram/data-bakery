@@ -198,18 +198,3 @@ You can then install the package in another local project like this:
 ```bash
 npm i /path/to/data-bakery-0.0.1.tgz
 ```
-
-
----
-
-TODO: It looks like we need a `USE databaseName;` at the top of every SQL file for this to work?
-
-A simple `cat *.sql > final.sql` or something would work but requires faff and juggling files around
-
-Might need to add a `databaseName` optional export to each recipe, with an optional default set in the `bakery.config.js` too to fallback to?
-
-From root dir:
-
-```bash
-docker run --rm -it -e MYSQL_ROOT_PASSWORD=password -v $(realpath tests/snapshot/tests/databakeryignore/actual-output):/docker-entrypoint-initdb.d mysql:5.7-debian
-```

@@ -1,6 +1,6 @@
 {
   "name": "data-bakery",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A tool to prepare test data",
   "main": "./src/recipe-helper.js",
   "scripts": {

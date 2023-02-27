@@ -1,2 +1,8 @@
 package-lock.json
-tests/*/actual-output
+tests/*/actual-output/*
+
+# Include the files that should be retained by .databakeryignore rules
+!tests/databakeryignore/actual-output/.databakeryignore
+!tests/databakeryignore/actual-output/00-schema.sql
+!tests/databakeryignore/actual-output/some-file.txt
+!tests/databakeryignore/actual-output/other-stuff/

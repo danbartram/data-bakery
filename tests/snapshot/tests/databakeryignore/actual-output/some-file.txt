@@ -1,0 +1,1 @@
+This file should persist between calls to `data-bakery generate` as it's in `.databakeryignore`.

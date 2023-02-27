@@ -181,10 +181,13 @@ To build as a local NPM package:
 # Install dependencies
 npm ci
 # Compile TS and generate .d.ts types
+rm -rf dist
 npx tsc
 # Copy the package.json into dist to avoid needing `dist` in imports
 cp package.json ./dist/
 cp .npmignore ./dist/
+cp README.md ./dist/
+cp LICENSE.md ./dist/
 
 # Build a local package in the root directory
 (cd dist && npm pack --pack-destination ../)

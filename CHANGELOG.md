@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Improve the docs in `README.md` to include config and all of the core features
+
 ## 1.0.2
 
 - Update `package.json` with `repository` and `keywords` data

@@ -23,14 +23,14 @@ program.configureOutput({
 
 program
   .name('Data Bakery')
-  .description('A tool to generate SQL data for tests')
+  .description('A helpful tool to generate SQL data for integration tests')
 
 program.command('generate')
   .description('Generate an SQL file')
   .argument('[config-file]', 'Path to a data-bakery.config.js file', 'data-bakery.config.js')
   .option('--debug', 'Enable debug logging')
-  .option('-s, --sql-dialect <start>', 'The type of SQL to generate (e.g. "mysql")')
-  .option('-d, --output-dir <filePath>', 'Directory for the exported SQL and metadata files')
+  .option('-s, --sql-dialect <dialect>', 'The type of SQL to generate (e.g. "mysql")')
+  .option('-d, --output-dir <directory>', 'Directory for the exported SQL and metadata files')
   .option('-r, --recipes-dir <directory>', 'Path to the directory containing recipes')
   .action(async (configFile: any, options: Config) => {
     if (options.debug === true) {

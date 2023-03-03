@@ -1,0 +1,7 @@
+## 1.0.2
+
+- Update `package.json` with `repository` and `keywords` data
+
+## 1.0.1
+
+- Add `README.md` and `LICENSE.md` to built package

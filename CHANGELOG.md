@@ -1,3 +1,10 @@
+## Next
+
+- Add `manager` to recipe context
+    - This is an instance of `RecipeManager`, to enable more powerful `getNamedId` usages
+- Add `RecipeManager.getNamedId` function to allow accessing Named ID values outside of simple column values
+    - For example, using the ID value to generate part of a string
+
 ## 1.0.3
 
 - Improve the docs in `README.md` to include config and all of the core features

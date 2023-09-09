@@ -1,7 +1,7 @@
 {
   "name": "data-bakery",
-  "version": "1.0.3",
-  "description": "A tool to prepare test data",
+  "version": "1.1.0",
+  "description": "A tool to prepare test SQL data for integration tests",
   "main": "./src/recipe-helper.js",
   "scripts": {
     "test": "jest"

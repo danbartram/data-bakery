@@ -1,4 +1,4 @@
-## Next
+## 1.1.0
 
 - Add `manager` to recipe context
     - This is an instance of `RecipeManager`, to enable more powerful `getNamedId` usages

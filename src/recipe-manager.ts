@@ -85,6 +85,14 @@ export class RecipeManager {
   }
 
   /**
+   * Convenience function to access generated named IDs, such as from the context
+   * of a recipe file being processed.
+   */
+  getNamedId (tableName: TableName, idName: NamedIdName): number {
+    return this.#generateNamedIdForTable(tableName, idName, true)
+  }
+
+  /**
    * Generate and retrieve the generated ID value for a given named ID.
    */
   #generateNamedIdForTable (tableName: TableName, idName: NamedIdName, isPlaceholder: boolean = false): number {

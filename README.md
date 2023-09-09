@@ -160,7 +160,8 @@ By default, all function recipes are provided a recipe context like this:
 
 ```ts
 {
-  sqlDialect: 'mysql'
+  sqlDialect: 'mysql',
+  manager: RecipeManager,
 }
 ```
 
@@ -229,6 +230,24 @@ module.exports = {
     },
   ],
 }
+```
+
+If you want to access the named ID outside of a simple column value use case, you should export your recipe as a function and use `manager.getNamedId()` instead.
+
+```ts
+module.exports = async ({ manager }) => ({
+  user: [
+    { id: new NamedId('firstUser'), email: 'hello@world.com' },
+  ],
+  user_extra: [
+    {
+      json: JSON.stringify({
+        // This will evaluate to `1-static-prefix` for example
+        generatedId: `${manager.getNamedId('user', 'firstUser')}-static-prefix`,
+      }),
+    },
+  ],
+})
 ```
 
 After running the `generate` command, a `meta.json` file will be created.

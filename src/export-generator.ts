@@ -54,6 +54,7 @@ export class ExportGenerator {
       const recipeContext = {
         ...this.#extraRecipeContext,
         sqlDialect: this.#sqlDialect,
+        manager: this.#recipeManager,
       }
       recipeBundle = await recipeExport(recipeContext)
     } else {

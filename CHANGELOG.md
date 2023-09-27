@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Fix issue with built package of v1.1.0
+
 ## 1.1.0
 
 - Add `manager` to recipe context

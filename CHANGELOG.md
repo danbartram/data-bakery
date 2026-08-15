@@ -1,6 +1,7 @@
 ## 1.2.0
 
 - Quote column names to prevent SQL syntax errors
+- Dependency updates
 
 ## 1.1.1
 

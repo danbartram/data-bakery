@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-versions: ['14.x', '16.x', '18.x']
+        node-versions: ['18.x', '20.x', '22.x', '24.x']
     steps:
       - uses: actions/checkout@v3
       - name: Use Node ${{ matrix.node-version }}

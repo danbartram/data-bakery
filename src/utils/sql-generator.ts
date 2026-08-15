@@ -33,7 +33,10 @@ export function sqlForRecipeBundle (recipeBundle: RecipeBundle, config: SQLGener
           return `(${newValueList.join(', ')})`
         })
 
-        sqlQueries.push(`INSERT INTO \`${tableName}\` (${columnMapKey}) VALUES ${valueLists.join(', ')};`)
+        const rawColumnNames = columnMapKey.split(',')
+        const quotedColumnNames = '`' + rawColumnNames.join('`, `') + '`'
+
+        sqlQueries.push(`INSERT INTO \`${tableName}\` (${quotedColumnNames}) VALUES ${valueLists.join(', ')};`)
       })
     })
   })

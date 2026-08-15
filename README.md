@@ -360,3 +360,10 @@ You can then install the package in another local project like this:
 ```bash
 npm i /path/to/data-bakery-0.0.1.tgz
 ```
+
+The package can then also be published to npm like this:
+
+```bash
+cd dist
+npm publish
+```

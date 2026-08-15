@@ -1,3 +1,7 @@
+## 1.2.1
+
+- Fix issue with built package of v1.2.0
+
 ## 1.2.0
 
 - Quote column names to prevent SQL syntax errors
